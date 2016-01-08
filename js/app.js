@@ -1,224 +1,142 @@
-// IFrame content load detector
+// View component -- View highlighter
 (function(){
-    window.gsdev || (window.gsdev = {});
-    window.gsdev.core || (window.gsdev.core = {});
 
-    window.gsdev.core.isFrameReady = function(iFrame, fn) {
-        var timer;
-        var fired = false;
-
-        function ready() {
-            if (!fired) {
-                fired = true;
-                clearTimeout(timer);
-                fn.call(this);
-            }
-        }
-
-        function readyState() {
-            if (this.readyState === "complete") {
-                ready.call(this);
-            }
-        }
-
-        iFrame.addEventListener("load", function () {
-            try{
-                ready.call(iFrame.contentDocument || iFrame.contentWindow.document);
-            }
-            catch (e){
-
-            }
-        });
-
-        function checkLoaded() {
-            try{
-                var doc = iFrame.contentDocument;
-            }
-            catch (e){
-                return;
-            }
-            if (doc.URL.indexOf("about:") !== 0) {
-                if (doc.readyState === "complete") {
-                    ready.call(doc);
-                } else {
-                    doc.addEventListener("DOMContentLoaded", ready);
-                    doc.addEventListener("readystatechange", readyState);
-                }
-            } else {
-                timer = window.setTimeout(checkLoaded, 1);
-            }
-        }
-        checkLoaded();
+   function ViewComponent(_doc){
+        this._wrapped = null;
+        this._doc = _doc;
+        this.wrapperClickHandler = _wrapperClickHandler.bind(this);
+        this.messageListener = _messageListener.bind(this);
+        this.positionWrapper = positionWrapper.bind(this);
     }
+
+    ViewComponent.prototype.init = function(){
+        this.initWrapper();
+        this.attachEvents();
+    }
+
+    ViewComponent.prototype.destroy = function(){
+        this.detachEvents();
+    }
+
+    ViewComponent.prototype.initWrapper = function (){
+        this._wrapper = this._doc.createElement('div');
+        this._wrapper.id = "__wrapper";
+        this._wrapper.addEventListener('click', this.wrapperClickHandler);
+        this._doc.body.appendChild(this._wrapper);
+    }
+
+    function _wrapperClickHandler(eve){
+        if(this._wrapper.isActive){
+            this._wrapper.className = "";
+            this._wrapper.isActive = false;
+            this.on();
+        }
+        else {
+            this._wrapper.className = "active";
+            this._wrapper.isActive = true;
+            this.off();
+        }
+    }
+
+    ViewComponent.prototype.getElementToBeHighlighted = function (eve){
+        var self = this;
+        var element,
+            x = eve.clientX,
+            y = eve.clientY,
+            elements = this._doc.elementsFromPoint(x, y);
+        element = elements.find(function(element){
+            if(element != self._wrapper){
+                return true;
+            }
+            return false;
+        });
+        return $(element).closest("[view-url]")[0];
+    }
+
+    function _positionWrapper(eve){
+        var eleToBeHighlighted = this.getElementToBeHighlighted(eve);
+        if(!eleToBeHighlighted){
+            this.hideWrapper();
+        }
+        else if(eleToBeHighlighted != this._wrapper.activeElement){
+            var position = eleToBeHighlighted.getBoundingClientRect();
+            this._wrapper.activeElement = eleToBeHighlighted;
+            this._wrapper.title = eleToBeHighlighted.getAttribute('view-url');
+            this._wrapper.style.top = position.top + "px";
+            this._wrapper.style.left = position.left + "px";
+            this._wrapper.style.width = eleToBeHighlighted.clientWidth + "px";
+            this._wrapper.style.height = eleToBeHighlighted.clientHeight + "px";
+            this._wrapper.style.display = "block";
+        }
+    }
+
+    function positionWrapper(eve){
+        var self = this;
+        window.setTimeout(function(eve){
+            _positionWrapper.call(self, eve);
+        }, 200, eve);
+    }
+
+    function _messageListener(message){
+        if(message.action == "ON_TRACKER"){
+            this.on();
+        }
+        else if(message.action == "OFF_TRACKER"){
+            this.hideWrapper();
+            this.off();
+        }
+    }
+
+    ViewComponent.prototype.attachEvents = function (){
+        chrome.runtime.onMessage.addListener(this.messageListener);
+        this._doc.addEventListener('unload', this.destroy);
+    }
+
+    ViewComponent.prototype.on = function (){
+        this._doc.addEventListener('mousemove', this.positionWrapper, true);
+    }
+
+    ViewComponent.prototype.off = function (){
+        this._doc.removeEventListener('mousemove', this.positionWrapper, true);
+    }
+
+    ViewComponent.prototype.hideWrapper = function (){
+        this._wrapper.style.display = "none";
+    }
+
+    ViewComponent.prototype.detachEvents = function (){
+        this.hideWrapper();
+        this.off();
+    }
+
+    window.addEventListener('load', function(eve){
+        new ViewComponent(document).init();
+    });
 })();
 
-
-document.addEventListener("DOMContentLoaded", function(event) {
-	gsdev.core.injectScripts(document);
-});
-
 (function(){
 
-	window.gsdev || (window.gsdev = {});
-    window.gsdev.core || (window.gsdev.core = {});
+	window.BVT || (window.BVT = {});
+    window.BVT.core || (window.BVT.core = {});
 
-    window.gsdev.core.getIFrameObserver = function(){
-        if(!gsdev.core.iframeObserver){
-            gsdev.core.iframeObserver = new MutationObserver(function(mutations) {
-                for (mutationIdx in mutations) {
-                    var mutation = mutations[mutationIdx];
-                    for (childIndex in mutation.addedNodes) {
-                        var child = mutation.addedNodes[childIndex];
-                        if (child.tagName && child.tagName.toLowerCase() == 'iframe') {
-                            gsdev.core.isFrameReady(child, function(){
-                                gsdev.core.injectScripts(this);
-                            });
-                        }
-                    }
-                }
-            });
-        }
-        return gsdev.core.iframeObserver;
-    };
-    window.gsdev.core.injectScripts = function(doc){
-        gsdev.core.loadScriptOnPage(doc, 'js/lib/object-watch.js');
-        gsdev.core.loadScriptOnPage(doc, 'js/inject.js');
-        var config = { attributes: false, subtree: true, childList: true, characterData: false };
-        gsdev.core.getIFrameObserver().observe(doc.body, config);
-        for(var i=0; i<doc.defaultView.frames.length; i++){
-            try{
-                var _doc = doc.defaultView.frames[i].contentDocument;
-            }
-            catch (e){ // iframe window is not accessible (cross domain?)
-                return;
-            }
-            // No need to load on the same window again
-            doc.defaultView != _doc.defaultView && gsdev.core.injectScripts(_doc);
-        }
+    window.BVT.core.injectScripts = function(doc){
+        BVT.core.loadScriptsOnPage(doc, ['js/lib/object-watch.js', 'js/inject.js']);
     };
 
-    window.gsdev.core.loadScriptOnPage = function(doc, url){
+    window.BVT.core.loadScriptsOnPage = function(doc, scripts){
         var s = doc.createElement('script');
         s.setAttribute('type', 'text/javascript');
-        s.setAttribute('src', chrome.extension.getURL(url));
-        doc.body.firstChildElement ? doc.body.insertBefore(s, doc.body.firstChildElement)
+        doc.body.firstElementChild ? doc.body.insertBefore(s, doc.body.firstElementChild)
             : doc.body.appendChild(s);
+        s.onload = function(eve){
+            if(scripts.length) {
+                window.BVT.core.loadScriptsOnPage(doc, scripts);
+            }
+        }
+        s.setAttribute('src', chrome.extension.getURL(scripts.shift()));
     }
-
-	gsdev.plugin = (function(){
-
-		var _wrapper = null;
-
-		function init(){
-			initWrapper();
-			attachEvents();
-		}
-
-		function destroy(){
-			detachEvents();
-		}
-		
-		function initWrapper(){
-			_wrapper = document.createElement('div');
-			_wrapper.id = "__wrapper";
-			_wrapper.addEventListener('click', wrapperClickHandler);
-			document.body.appendChild(_wrapper);
-		}
-
-		function wrapperClickHandler(eve){
-			if(_wrapper.isActive){
-				_wrapper.className = "";
-				_wrapper.isActive = false;
-				on();
-			}
-			else {
-				_wrapper.className = "active";
-				_wrapper.isActive = true;
-				off();
-				showDetailView(_wrapper.activeElement);
-			}
-		}
-
-		function showDetailView(ele){
-			//$.getScript();
-		}
-
-		function getElementToBeHighlighted(eve){
-			var element,
-				x = eve.clientX,
-				y = eve.clientY,
-				elements = document.elementsFromPoint(x, y);
-			element = elements.find(function(element){
-				if(element != _wrapper){
-					return true;
-				}
-				return false;
-			});
-			return $(element).closest("[view-url]")[0];
-		}
-
-		function _positionWrapper(eve){
-			var eleToBeHighlighted = getElementToBeHighlighted(eve);
-			if(!eleToBeHighlighted){
-				hideWrapper();
-			}
-			else if(eleToBeHighlighted != _wrapper.activeElement){
-				var position = eleToBeHighlighted.getBoundingClientRect();
-				_wrapper.activeElement = eleToBeHighlighted;
-				_wrapper.title = eleToBeHighlighted.getAttribute('view-url');
-				_wrapper.style.top = position.top + "px";
-				_wrapper.style.left = position.left + "px";
-				_wrapper.style.width = eleToBeHighlighted.clientWidth + "px";
-				_wrapper.style.height = eleToBeHighlighted.clientHeight + "px";
-				_wrapper.style.display = "block";
-			}
-		}
-
-		function positionWrapper(eve){
-			window.setTimeout(function(eve){
-				_positionWrapper(eve);
-			}, 200, eve);
-		}
-
-		function messageListener(message){
-			if(message.action == "ON_TRACKER"){
-				on();
-			}
-			else if(message.action == "OFF_TRACKER"){
-				hideWrapper();
-				off();
-			}
-		}
-
-		function attachEvents(){
-			chrome.runtime.onMessage.addListener(messageListener);
-			document.addEventListener('unload', destroy);
-		}
-
-		function on(){
-			document.addEventListener('mousemove', positionWrapper, true);
-		}
-
-		function off(){
-			document.removeEventListener('mousemove', positionWrapper, true);
-		}
-
-		function hideWrapper(){
-			_wrapper.style.display = "none";
-		}
-
-		function detachEvents(){
-			hideWrapper();
-			off();
-		}
-
-		return {
-			init: init
-		}
-
-	})();
-
-	window.onload = function(){
-		gsdev.plugin.init();
-	}
 })();
+
+document.addEventListener("DOMContentLoaded", function(event) {
+    BVT.core.injectScripts(document);
+});

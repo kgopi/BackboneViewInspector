@@ -13,7 +13,8 @@
       "matches": ["https://*/*", "http://*/*"],
       "css": ["css/app.css"],
       "js": ["js/lib/jquery-1.5.2.min.js", "js/app.js"],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "all_frames":true
     }
   ],
   "background": { "scripts": ["js/background.js"] },

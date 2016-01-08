@@ -1,5 +1,23 @@
 (function($){
 
+	function isWindowAccessible(_win){
+		try{
+			_win.document;
+		}
+		catch (e){
+			return false;
+		}
+		return true;
+	}
+
+	function setAppRoot(){
+		var currentWindow = window;
+		while(isWindowAccessible(currentWindow.parent) && currentWindow.parent != currentWindow){
+			currentWindow = currentWindow.parent;
+		}
+		document.__bvtExtRoot = currentWindow;
+	}
+
 	function findProperty(soureceObj, property, callback){
 		if(soureceObj[property]){
 			soureceObj[property] = callback(soureceObj[property]);
@@ -10,8 +28,7 @@
 			});
 		}
 	}
-	
-	findProperty(window, 'Backbone', onBackboneFind);
+
 	function onBackboneFind(_Backbone){
 		findProperty(_Backbone, 'View', onViewFind);
 		return _Backbone;
@@ -55,6 +72,9 @@
 	        return _viewExtend.call(this, protoProps, classProps);
 	    };
 	    return newExtend;
-	}	
+	}
+
+	findProperty(window, 'Backbone', onBackboneFind);
+	setAppRoot();
 
 })();

@@ -1,6 +1,6 @@
 #__wrapper{
 	position: fixed;
-    z-index: 99999;
+    z-index: 100000000;
 	opacity: 0.4;
 	background-color: #0D8EC7;
 	display: none;
