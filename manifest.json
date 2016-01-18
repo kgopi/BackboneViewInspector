@@ -4,7 +4,7 @@
   "description": "This extension will track the backbone views",
   "version": "1.0",
   "browser_action": {
-    "default_icon": "images/Active.png",
+    "default_icon": "images/InActive.png",
     "default_title": "Track Backbone views powering the page"
   },
   "permissions": ["activeTab"],

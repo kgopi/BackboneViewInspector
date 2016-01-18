@@ -1,3 +1,7 @@
+/**
+ * Created by KGopi on 12/3/2015.
+ */
+
 // View component -- View highlighter
 (function(){
 
@@ -85,6 +89,14 @@
             this.hideWrapper();
             this.off();
         }
+        else if(message.action == "SEND_VIEW_COUNT"){
+            sendViewCount2Background();
+        }
+    }
+
+    function sendViewCount2Background(){
+        var event = new CustomEvent('SEND_VIEW_COUNT');
+        document.dispatchEvent(event);
     }
 
     ViewComponent.prototype.attachEvents = function (){
@@ -140,3 +152,8 @@
 document.addEventListener("DOMContentLoaded", function(event) {
     BVT.core.injectScripts(document);
 });
+
+document.addEventListener("SHOW_BANNER_TEXT", function(event) {
+    chrome.runtime.sendMessage(""+chrome.runtime.id, {data: event.detail});
+});
+
