@@ -97,7 +97,8 @@
 			catch(e){
 				var urls = e.stack.split(' at ');
 				url = urls.find(function(url){
-					return url.indexOf('inject.js') == -1;
+                    // Expecting View object will be created via new operator
+					return url.indexOf('inject.js') == -1 && url.indexOf("new ") == 0;
 				});
 			}
 			this.$el && this.$el.attr('view-url', url);

@@ -4,24 +4,43 @@
 
 var isActive = false;
 var viewCountArray = {};
-function toggleState(tabId){
-    typeof  tabId === "number" || (tabId = tabId.id);
-    if(isActive){
-        chrome.tabs.sendMessage(tabId, {action: "OFF_TRACKER"}, function(response) {});
-        isActive = false;
-        chnageIcon(tabId);
-    }
-    else{
+
+
+var BVT = {
+    getPath: function(imageFile){
+        return {
+            "19":	"images/19/" + imageFile,
+            "38":	"images/38/" + imageFile
+        };
+    },
+    enable: function(tabId){
         chrome.tabs.sendMessage(tabId, {action: "ON_TRACKER"}, function(response) {});
+        chrome.browserAction.setIcon({path: BVT.getPath("active.png")});
+        chrome.tabs.sendMessage(tabId, {action: "SEND_VIEW_COUNT"}, function(response) {});
         isActive = true;
-        chnageIcon(tabId);
+    },
+    disable: function(tabId){
+        chrome.tabs.sendMessage(tabId, {action: "OFF_TRACKER"}, function(response) {});
+        chrome.browserAction.setIcon({path: BVT.getPath("inactive.png")});
+        chrome.browserAction.setBadgeText({text: "", tabId: tabId});
+        isActive = false;
+    },
+    toggleState: function(tabId){
+        typeof  tabId === "number" || (tabId = tabId.id);
+        isActive ? BVT.disable(tabId) : BVT.enable(tabId); // toggle
+    },
+    initTracker: function(tabId){
+        if(isActive){
+            chrome.tabs.sendMessage(tabId, {action: "ON_TRACKER"}, function(response) {});
+            chrome.tabs.sendMessage(tabId, {action: "SEND_VIEW_COUNT"}, function(response) {});
+        }else{
+            chrome.tabs.sendMessage(tabId, {action: "OFF_TRACKER"}, function(response) {});
+            chrome.browserAction.setBadgeText({text: "", tabId: tabId});
+        }
     }
-}
-function chnageIcon(tabId){
-    chrome.browserAction.setIcon({path: isActive ? "images/Active.png" : "images/InActive.png"});
-    isActive ? chrome.tabs.sendMessage(tabId, {action: "SEND_VIEW_COUNT"}, function(response) {})
-        : chrome.browserAction.setBadgeText({text: "", tabId: tabId});
-}
+};
+
+// Events
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         //chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 255] });
@@ -40,10 +59,13 @@ chrome.runtime.onMessage.addListener(
 );
 chrome.tabs.onCreated.addListener(function(tab){
     viewCountArray[tab] = {};
-    toggleState(tab);
+    BVT.initTracker(tab);
 });
 chrome.tabs.onUpdated.addListener(function(tab){
     viewCountArray[tab] = {};
-    toggleState(tab);
+    BVT.initTracker(tab);
 });
-chrome.browserAction.onClicked.addListener(toggleState);
+chrome.tabs.onActivated.addListener(function(tab){
+    BVT.initTracker(tab.tabId);
+});
+chrome.browserAction.onClicked.addListener(BVT.toggleState);

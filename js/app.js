@@ -61,8 +61,12 @@
         var eleToBeHighlighted = this.getElementToBeHighlighted(eve);
         if(!eleToBeHighlighted){
             this.hideWrapper();
+            return;
         }
-        else if(eleToBeHighlighted != this._wrapper.activeElement){
+
+        if(eleToBeHighlighted == this._wrapper.activeElement){
+            this._wrapper.style.display = "block";
+        }else{
             var position = eleToBeHighlighted.getBoundingClientRect();
             this._wrapper.activeElement = eleToBeHighlighted;
             this._wrapper.title = eleToBeHighlighted.getAttribute('view-url');
