@@ -43,11 +43,13 @@
                 target: 'mouse', // Track the mouse as the positioning target
                 adjust: { x: 10, y: 10 } // Offset it slightly from under the mouse
             },
-            show: {
-                event: 'click mouseenter'
-            },
             style: {
                 classes: 'qtip-custom qtip-bootstrap'
+            },
+            events: {
+                move: function(event, api) {
+                    api.elements.content.text(self._wrapper._tooltip);
+                }
             }
         });
     };
@@ -90,6 +92,7 @@
 
         if(eleToBeHighlighted == this._wrapper.activeElement){
             this._wrapper.style.display = "block";
+            this._wrapper._tooltip = this._wrapper.activeElement.getAttribute('view-url');
         }else{
             var position = eleToBeHighlighted.getBoundingClientRect();
             this._wrapper.activeElement = eleToBeHighlighted;
