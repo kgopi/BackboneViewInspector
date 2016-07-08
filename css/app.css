@@ -32,3 +32,6 @@ div#__wrapper.active::after {
     z-index: 9999999;
     right: -2px;
 }
+.qtip-custom{
+    z-index: 100000001!important;
+}

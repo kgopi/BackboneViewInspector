@@ -14,8 +14,8 @@
   "content_scripts": [
     {
       "matches": ["https://*/*", "http://*/*"],
-      "css": ["css/app.css"],
-      "js": ["js/lib/jquery-1.5.2.min.js", "js/app.js"],
+      "css": ["css/jquery.qtip.min.css", "css/app.css"],
+      "js": ["js/lib/jquery-1.10.0.min.js", "js/lib/jquery.qtip.min.js", "js/app.js"],
       "run_at": "document_start",
       "all_frames":true
     }

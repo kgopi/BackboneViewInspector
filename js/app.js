@@ -6,7 +6,7 @@
 (function(){
 
    function ViewComponent(_doc){
-        this._wrapped = null;
+        this._wrapper = null;
         this._doc = _doc;
         this.wrapperClickHandler = _wrapperClickHandler.bind(this);
         this.messageListener = _messageListener.bind(this);
@@ -16,18 +16,41 @@
     ViewComponent.prototype.init = function(){
         this.initWrapper();
         this.attachEvents();
-    }
+    };
 
     ViewComponent.prototype.destroy = function(){
         this.detachEvents();
-    }
+    };
 
     ViewComponent.prototype.initWrapper = function (){
         this._wrapper = this._doc.createElement('div');
         this._wrapper.id = "__wrapper";
         this._wrapper.addEventListener('click', this.wrapperClickHandler);
         this._doc.body.appendChild(this._wrapper);
-    }
+        this.initToolTip();
+
+    };
+
+    ViewComponent.prototype.initToolTip = function(){
+        var self = this;
+        $(this._wrapper).qtip({
+            content: {
+                text: function(){
+                    return self._wrapper._tooltip;
+                }
+            },
+            position: {
+                target: 'mouse', // Track the mouse as the positioning target
+                adjust: { x: 10, y: 10 } // Offset it slightly from under the mouse
+            },
+            show: {
+                event: 'click mouseenter'
+            },
+            style: {
+                classes: 'qtip-custom qtip-bootstrap'
+            }
+        });
+    };
 
     function _wrapperClickHandler(eve){
         if(this._wrapper.isActive){
@@ -38,6 +61,7 @@
         else {
             this._wrapper.className = "active";
             this._wrapper.isActive = true;
+            console.log(this._wrapper._tooltip);
             this.off();
         }
     }
@@ -69,7 +93,7 @@
         }else{
             var position = eleToBeHighlighted.getBoundingClientRect();
             this._wrapper.activeElement = eleToBeHighlighted;
-            this._wrapper.title = eleToBeHighlighted.getAttribute('view-url');
+            this._wrapper._tooltip = eleToBeHighlighted.getAttribute('view-url');
             this._wrapper.style.top = position.top + "px";
             this._wrapper.style.left = position.left + "px";
             this._wrapper.style.width = eleToBeHighlighted.clientWidth + "px";
