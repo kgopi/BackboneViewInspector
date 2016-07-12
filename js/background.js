@@ -9,8 +9,9 @@ var viewCountArray = {};
 var BVT = {
     getPath: function(imageFile){
         return {
+            "16":	"images/16/" + imageFile,
             "19":	"images/19/" + imageFile,
-            "38":	"images/38/" + imageFile
+            "48":	"images/48/" + imageFile
         };
     },
     enable: function(tabId){

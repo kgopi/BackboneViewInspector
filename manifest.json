@@ -5,8 +5,9 @@
   "version": "0.1",
   "browser_action": {
     "default_icon": {
+      "16": "images/16/inactive.png",
       "19": "images/19/inactive.png",
-      "38": "images/38/inactive.png"
+      "48": "images/48/inactive.png"
     },
     "default_title": "Track Backbone views powering the page"
   },
@@ -24,10 +25,11 @@
   "web_accessible_resources": [
     "js/*",
     "template/*"
-  ]/*,
+  ],
   "icons": {
-    "16":	"icons/icon16.png",
-    "48":	"icons/icon48.png",
-    "128":	"icons/icon128.png"
-  }*/
+    "16":	"icons/16.png",
+    "19":	"icons/19.png",
+    "48":	"icons/48.png",
+    "128":	"icons/128.png"
+  }
 }
