@@ -50,6 +50,9 @@
                 move: function(event, api) {
                     api.elements.content.text(self._wrapper._tooltip);
                 }
+            },
+            show: {
+                event: 'mouseover'
             }
         });
     };
