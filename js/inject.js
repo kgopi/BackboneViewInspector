@@ -112,10 +112,19 @@
 						eleProp.object.$el.attr('view-url') ||
 						eleProp.object.$el.attr('view-url', eleProp.oldValue.attr('view-url'));
 					}, ["update"]);
-				}
+				}else{
+                    this.watch('$el', function(prop, oldEl, newEl){
+                        return setEl(prop, oldEl, newEl);
+                    });
+                }
 				return self;
 			};
 		}
+        
+        function setEl(prop, oldEl, newEl){
+            newEl.attr('view-url') || newEl.attr('view-url', oldEl.attr('view-url'));
+            return newEl;
+        }
 
 		function wrapViewExtend(_viewExtend){
 			var newExtend = function (protoProps, classProps) {
@@ -133,7 +142,11 @@
 							eleProp.object.$el.attr('view-url') ||
 							eleProp.object.$el.attr('view-url', eleProp.oldValue.attr('view-url'));
 						}, ["update"]);
-					}
+					}else{
+                        this.watch('$el', function(prop, oldEl, newEl){
+                            return setEl(prop, oldEl, newEl);
+                        });
+                    }
 					return self;
 				};
 				protoProps.initialize = newInit;
