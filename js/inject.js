@@ -105,18 +105,10 @@
 					});
 				}
 				this.$el && this.$el.attr('view-url', url);
-				if(Object.observe){
-					Object.observe(this, function(changes){
-						var eleProp = _.filter(changes, function(prop){ return prop.name == "$el"; })[0];
-						if(!eleProp) return;
-						eleProp.object.$el.attr('view-url') ||
-						eleProp.object.$el.attr('view-url', eleProp.oldValue.attr('view-url'));
-					}, ["update"]);
-				}else{
-                    this.watch('$el', function(prop, oldEl, newEl){
-                        return setEl(prop, oldEl, newEl);
-                    });
-                }
+				this.watch('$el', function(prop, oldEl, newEl){
+				    return setEl(prop, oldEl, newEl);
+				});
+
 				return self;
 			};
 		}
@@ -137,18 +129,10 @@
 					_init && (self = _init.apply(this, arguments));
 					updateViewsList(this.cid);
 					this.$el && this.$el.attr('view-url', url);
-					if(Object.observe){
-						Object.observe(this, function(changes){
-							var eleProp = _.filter(changes, function(prop){ return prop.name == "$el"; })[0];
-							if(!eleProp) return;
-							eleProp.object.$el.attr('view-url') ||
-							eleProp.object.$el.attr('view-url', eleProp.oldValue.attr('view-url'));
-						}, ["update"]);
-					}else{
-                        this.watch('$el', function(prop, oldEl, newEl){
-                            return setEl(prop, oldEl, newEl);
-                        });
-                    }
+					this.watch('$el', function(prop, oldEl, newEl){
+						return setEl(prop, oldEl, newEl);
+					});
+
 					return self;
 				};
 				protoProps.initialize = newInit;
