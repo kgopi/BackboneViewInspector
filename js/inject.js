@@ -120,11 +120,13 @@
 				return self;
 			};
 		}
-        
-        function setEl(prop, oldEl, newEl){
-            newEl.attr('view-url') || newEl.attr('view-url', oldEl.attr('view-url'));
-            return newEl;
-        }
+
+    function setEl(prop, oldEl, newEl){
+			if(newEl){
+        newEl.attr('view-url') || newEl.attr('view-url', oldEl.attr('view-url'));
+        return newEl;
+			}
+    }
 
 		function wrapViewExtend(_viewExtend){
 			var newExtend = function (protoProps, classProps) {
