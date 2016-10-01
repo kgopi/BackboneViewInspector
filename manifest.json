@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Backbone View Inspector",
   "description": "This extension will track the backbone views",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "browser_action": {
     "default_icon":  {
       "16": "images/16/inactive.png",
