@@ -172,8 +172,13 @@
     window.BVT.core.loadScriptsOnPage = function(doc, scripts){
         var s = doc.createElement('script');
         s.setAttribute('type', 'text/javascript');
-        doc.body.firstElementChild ? doc.body.insertBefore(s, doc.body.firstElementChild)
-            : doc.body.appendChild(s);
+        if(doc.body){
+            doc.body.firstElementChild ? doc.body.insertBefore(s, doc.body.firstElementChild)
+                : doc.body.appendChild(s);
+        }else{
+            doc.head.firstElementChild ? doc.head.insertBefore(s, doc.head.firstElementChild) : doc.head.appendChild(s);
+        }
+
         s.onload = function(eve){
             if(scripts.length) {
                 window.BVT.core.loadScriptsOnPage(doc, scripts);
