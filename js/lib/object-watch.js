@@ -8,9 +8,9 @@
  * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
  */
 
-// object.watch
-if (!Object.prototype.watch) {
-	Object.defineProperty(Object.prototype, "watch", {
+// object.bviWatch
+if (!Object.prototype.bviWatch) {
+	Object.defineProperty(Object.prototype, "bviWatch", {
 		  enumerable: false
 		, configurable: true
 		, writable: false
@@ -39,9 +39,9 @@ if (!Object.prototype.watch) {
 	});
 }
 
-// object.unwatch
-if (!Object.prototype.unwatch) {
-	Object.defineProperty(Object.prototype, "unwatch", {
+// object.bviUnwatch
+if (!Object.prototype.bviUnwatch) {
+	Object.defineProperty(Object.prototype, "bviUnwatch", {
 		  enumerable: false
 		, configurable: true
 		, writable: false

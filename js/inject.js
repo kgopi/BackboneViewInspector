@@ -55,7 +55,7 @@
 				soureceObj[property] = callback(soureceObj[property]);
 			}
 			else{
-				soureceObj.watch(property, function(property, oldvalue, newValue){
+				soureceObj.bviWatch(property, function(property, oldvalue, newValue){
 					return callback(newValue);
 				});
 			}
@@ -105,7 +105,7 @@
 					});
 				}
 				this.$el && this.$el.attr('view-url', url);
-				this.watch('$el', function(prop, oldEl, newEl){
+				this.bviWatch('$el', function(prop, oldEl, newEl){
 					newEl && (newEl.attr('view-url') || newEl.attr('view-url', oldEl.attr('view-url')));
 					return newEl;
 				});
@@ -122,7 +122,7 @@
 					_init && (self = _init.apply(this, arguments));
 					updateViewsList(this.cid);
 					this.$el && this.$el.attr('view-url', url);
-					this.watch('$el', function(prop, oldEl, newEl){
+					this.bviWatch('$el', function(prop, oldEl, newEl){
 						newEl && (newEl.attr('view-url') || newEl.attr('view-url', oldEl.attr('view-url')));
 						return newEl;
 					});
