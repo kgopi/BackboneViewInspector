@@ -106,7 +106,7 @@
 				}
 				this.$el && this.$el.attr('view-url', url);
 				this.bviWatch('$el', function(prop, oldEl, newEl){
-					newEl && (newEl.attr('view-url') || newEl.attr('view-url', oldEl.attr('view-url')));
+					(newEl && oldEl) && (newEl.attr('view-url') || newEl.attr('view-url', oldEl.attr('view-url')));
 					return newEl;
 				});
 				return self;
@@ -116,19 +116,21 @@
 		function wrapViewExtend(_viewExtend){
 			var newExtend = function (protoProps, classProps) {
 				var url;
-				var _init = protoProps.initialize;
-				var newInit = function(){
-					var self = this;
-					_init && (self = _init.apply(this, arguments));
-					updateViewsList(this.cid);
-					this.$el && this.$el.attr('view-url', url);
-					this.bviWatch('$el', function(prop, oldEl, newEl){
-						newEl && (newEl.attr('view-url') || newEl.attr('view-url', oldEl.attr('view-url')));
-						return newEl;
-					});
-					return self;
-				};
-				protoProps.initialize = newInit;
+				if(protoProps){
+					var _init = protoProps.initialize;
+					var newInit = function(){
+						var self = this;
+						_init && (self = _init.apply(this, arguments));
+						updateViewsList(this.cid);
+						this.$el && this.$el.attr('view-url', url);
+						this.bviWatch('$el', function(prop, oldEl, newEl){
+							(newEl && oldEl) && (newEl.attr('view-url') || newEl.attr('view-url', oldEl.attr('view-url')));
+							return newEl;
+						});
+						return self;
+					};
+					protoProps.initialize = newInit;
+				}
 				try{
 					throw new Error("inject.js");
 				}
