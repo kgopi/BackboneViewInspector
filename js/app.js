@@ -103,7 +103,17 @@
             this._wrapper.style.top = position.top + "px";
             this._wrapper.style.left = position.left + "px";
             this._wrapper.style.width = eleToBeHighlighted.clientWidth + "px";
-            this._wrapper.style.height = eleToBeHighlighted.clientHeight + "px";
+
+            var height = eleToBeHighlighted.clientHeight;
+            if(!height){
+                $("*", eleToBeHighlighted).each(function(){
+                    if ($(this).height() > height ) {
+                        height = $(this).height();
+                    }
+                });
+            }
+            this._wrapper.style.height = height + "px";
+
             this._wrapper.style.display = "block";
         }
     }
@@ -188,8 +198,26 @@
     }
 })();
 
+var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        var hBNode = Array.prototype.find.call(mutation.addedNodes, function(node){
+            return node.nodeName.toLowerCase().match(/(head|body)/);
+        });
+        if(hBNode){
+            observer.disconnect();
+            BVT.core.injectScripts(document);
+        }
+    });
+});
+
+// configuration of the observer:
+var config = {attributes: false, childList: true, characterData: false, subtree: false, attributeOldValue: false};
+
+// pass in the target node, as well as the observer options
+observer.observe(document.documentElement, config);
+
 document.addEventListener("DOMContentLoaded", function(event) {
-    BVT.core.injectScripts(document);
+    observer.disconnect();
 });
 
 document.addEventListener("SHOW_BANNER_TEXT", function(event) {
