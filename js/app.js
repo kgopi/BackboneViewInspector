@@ -44,7 +44,7 @@
                 adjust: { x: 10, y: 10 } // Offset it slightly from under the mouse
             },
             style: {
-                classes: 'qtip-custom qtip-bootstrap'
+                classes: 'bvi-qtip qtip-bootstrap'
             },
             events: {
                 move: function(event, api) {

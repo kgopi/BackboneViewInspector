@@ -32,6 +32,9 @@ div#__wrapper.active::after {
     z-index: 9999999;
     right: -2px;
 }
-.qtip-custom{
+.bvi-qtip{
     z-index: 100000001!important;
+}
+.bvi-qtip .qtip-content{
+    color: #333!important;
 }
