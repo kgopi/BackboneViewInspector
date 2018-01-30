@@ -1,22 +1,21 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Backbone View Inspector",
-  "description": "This extension will track the backbone views",
-  "version": "0.1.5",
+  "description": "Display a running count of Backbone Views",
+  "version": "1.0.0",
   "browser_action": {
     "default_icon":  {
       "16": "images/16/inactive.png",
       "19": "images/19/inactive.png",
       "48": "images/48/inactive.png"
     },
-    "default_title": "Track Backbone views powering the page"
+    "default_title": "Display a running count of Backbone Views"
   },
   "permissions": ["activeTab"],
   "content_scripts": [
     {
       "matches": ["https://*/*", "http://*/*"],
-      "css": ["css/jquery.qtip.min.css", "css/app.css"],
-      "js": ["js/lib/jquery-1.10.0.min.js", "js/lib/jquery.qtip.min.js", "js/app.js"],
+      "js": ["js/lib/jquery-1.10.0.min.js", "js/app.js"],
       "run_at": "document_start",
       "all_frames":true
     }
@@ -32,5 +31,5 @@
     "48":	"icons/48.png",
     "128":	"icons/128.png"
   },
-  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'"
+  "content_security_policy": "script-src 'self'; object-src 'self'"
 }
